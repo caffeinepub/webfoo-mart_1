@@ -24,7 +24,7 @@ export default function Header() {
           className="flex items-center gap-2"
           data-ocid="nav.home_link"
         >
-          <WFLogo size="sm" showLabel={true} />
+          <WFLogo size="sm" showLabel={false} />
         </Link>
 
         {/* Right actions */}

@@ -58,7 +58,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
-          <WFLogo size="md" showLabel={true} />
+          <WFLogo size="md" showLabel={false} />
         </div>
         <div className="wfm-card p-6">
           <div className="flex items-center gap-2 mb-1">

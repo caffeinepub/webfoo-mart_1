@@ -32,7 +32,7 @@ export default function HomePage() {
     <main className="min-h-screen pb-20">
       {/* Hero */}
       <section className="flex flex-col items-center pt-10 pb-8 px-4">
-        <WFLogo size="lg" showLabel={true} />
+        <WFLogo size="lg" showLabel={false} />
         <p className="mt-3 text-muted-foreground text-sm text-center max-w-xs">
           Shop from 12 curated stores — fresh, fast, and delivered to your door
         </p>
