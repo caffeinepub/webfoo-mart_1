@@ -377,7 +377,7 @@ function OrderConfirmModal({
                 data-ocid="order_modal.view_details_button"
               >
                 <ShoppingBag className="w-4 h-4" />
-                View Order Details
+                View Order Placed
               </button>
               <button
                 type="button"
@@ -492,7 +492,9 @@ export default function CheckoutPage() {
         <OrderConfirmModal
           order={placedOrder}
           onContinueShopping={() => navigate("/")}
-          onViewDetails={() => navigate("/orders")}
+          onViewDetails={() =>
+            navigate("/order-confirmed", { state: { order: placedOrder } })
+          }
         />
       )}
 
