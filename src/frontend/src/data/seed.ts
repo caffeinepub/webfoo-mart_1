@@ -25,6 +25,7 @@ export interface Order {
   items: OrderItem[];
   total: number;
   address: string;
+  pinCode?: string;
   phone: string;
   status: OrderStatus;
   createdAt: string;
