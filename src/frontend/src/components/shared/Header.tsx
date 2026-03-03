@@ -21,7 +21,7 @@ export default function Header() {
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 transition-all duration-200 hover:drop-shadow-[0_0_6px_oklch(0.82_0.15_85/0.6)]"
           data-ocid="nav.home_link"
         >
           <WFLogo size="sm" showLabel={false} />

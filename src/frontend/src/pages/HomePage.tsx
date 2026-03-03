@@ -29,10 +29,12 @@ export default function HomePage() {
   const isSearching = query.trim().length > 0;
 
   return (
-    <main className="min-h-screen pb-20">
+    <main className="min-h-screen pb-20 page-enter">
       {/* Hero */}
       <section className="flex flex-col items-center pt-10 pb-8 px-4">
-        <WFLogo size="lg" showLabel={false} />
+        <div className="logo-float">
+          <WFLogo size="lg" showLabel={false} />
+        </div>
         <p className="mt-3 text-muted-foreground text-sm text-center max-w-xs">
           Shop from 12 curated stores — fresh, fast, and delivered to your door
         </p>
@@ -103,13 +105,18 @@ export default function HomePage() {
       {/* Stores Grid */}
       {!isSearching && (
         <section className="max-w-6xl mx-auto px-4">
-          <h2 className="text-lg font-bold text-foreground mb-4">Our Stores</h2>
+          <h2 className="text-lg font-bold mb-4 shimmer-text">Our Stores</h2>
           <div
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
             data-ocid="home.stores_list"
           >
             {stores.map((store, i) => (
-              <StoreCard key={store.id} store={store} index={i + 1} />
+              <div
+                key={store.id}
+                className={`card-reveal stagger-${(i % 6) + 1}`}
+              >
+                <StoreCard store={store} index={i + 1} />
+              </div>
             ))}
           </div>
         </section>

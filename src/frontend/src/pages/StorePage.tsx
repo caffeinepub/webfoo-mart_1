@@ -27,7 +27,7 @@ export default function StorePage() {
   }
 
   return (
-    <main className="min-h-screen pb-24">
+    <main className="min-h-screen pb-24 page-enter">
       {/* Banner */}
       <div className="relative h-48 sm:h-64 overflow-hidden">
         <img
@@ -68,7 +68,12 @@ export default function StorePage() {
             data-ocid="store.product_list"
           >
             {storeProducts.map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i + 1} />
+              <div
+                key={product.id}
+                className={`card-reveal stagger-${(i % 6) + 1}`}
+              >
+                <ProductCard product={product} index={i + 1} />
+              </div>
             ))}
           </div>
         )}

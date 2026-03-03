@@ -21,7 +21,7 @@ export default function WFLogo({
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <img
-        src="/assets/uploads/cropped_circle_image-1.png"
+        src="/assets/uploads/cropped_circle_image-1-1.png"
         alt="WebFoo Mart Logo"
         width={s.img}
         height={s.img}

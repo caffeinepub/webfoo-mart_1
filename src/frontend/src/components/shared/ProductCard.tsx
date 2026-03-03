@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { type Product, formatPrice } from "../../data/seed";
 
@@ -8,11 +8,15 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index }: ProductCardProps) {
+  const [popping, setPopping] = useState(false);
+
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group block wfm-card hover:border-primary/40 transition-all duration-200 hover:-translate-y-0.5"
+      className={`group block wfm-card hover:border-primary/40 transition-all duration-200 hover:-translate-y-0.5 ${popping ? "card-pop-active" : ""}`}
       data-ocid={`store.product_card.${index}`}
+      onMouseDown={() => setPopping(true)}
+      onAnimationEnd={() => setPopping(false)}
     >
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-secondary">

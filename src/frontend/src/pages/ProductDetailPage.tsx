@@ -49,7 +49,7 @@ export default function ProductDetailPage() {
       : 0;
 
   return (
-    <main className="min-h-screen pb-24">
+    <main className="min-h-screen pb-24 page-enter">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">

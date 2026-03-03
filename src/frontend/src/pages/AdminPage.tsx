@@ -1,22 +1,27 @@
 import {
-  Check,
   ChevronDown,
   ChevronRight,
   Edit2,
   Eye,
   EyeOff,
+  IndianRupee,
+  LayoutDashboard,
   Lock,
+  LogOut,
   Package,
   Plus,
   Save,
   ShoppingBag,
+  ShoppingCart,
   Store,
   Trash2,
+  TrendingUp,
   Upload,
   Users,
   X,
 } from "lucide-react";
-import React, { useState, useEffect, useCallback } from "react";
+import type React from "react";
+import { useCallback, useState } from "react";
 import WFLogo from "../components/shared/WFLogo";
 import {
   type Customer,
@@ -38,39 +43,89 @@ import {
 const ADMIN_PASSWORD = "webfoo@admin2026";
 const ADMIN_AUTH_KEY = "wfm_admin_auth";
 
-// ─── Password Gate ─────────────────────────────────────────────────────────────
+// ─── Password Gate (Glassmorphism redesign) ────────────────────────────────────
 function PasswordGate({ onAuth }: { onAuth: () => void }) {
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw === ADMIN_PASSWORD) {
-      sessionStorage.setItem(ADMIN_AUTH_KEY, "1");
-      onAuth();
-    } else {
-      setError("Incorrect password. Try again.");
-    }
+    setLoading(true);
+    setTimeout(() => {
+      if (pw === ADMIN_PASSWORD) {
+        sessionStorage.setItem(ADMIN_AUTH_KEY, "1");
+        onAuth();
+      } else {
+        setError("Incorrect password. Try again.");
+        setLoading(false);
+      }
+    }, 400);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm">
-        <div className="flex justify-center mb-8">
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{
+        background:
+          "radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.35 0.12 213 / 0.25) 0%, oklch(0.08 0 0) 60%)",
+      }}
+    >
+      {/* Background grid pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(oklch(1 0 0) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
           <WFLogo size="md" showLabel={false} />
-        </div>
-        <div className="wfm-card p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Lock className="w-4 h-4 text-primary" />
-            <h1 className="text-lg font-bold text-foreground">Admin Access</h1>
-          </div>
-          <p className="text-sm text-muted-foreground mb-5">
-            Enter the admin password to continue.
+          <p
+            className="text-xs font-semibold uppercase tracking-[0.25em] mt-3"
+            style={{ color: "oklch(0.72 0.17 213 / 0.8)" }}
+          >
+            Admin Command Center
           </p>
+        </div>
+
+        {/* Glassmorphism card */}
+        <div className="admin-glass-card rounded-2xl p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: "oklch(0.72 0.17 213 / 0.15)" }}
+            >
+              <Lock
+                className="w-5 h-5"
+                style={{ color: "oklch(0.72 0.17 213)" }}
+              />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-foreground">
+                Secure Access
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                Admin credentials required
+              </p>
+            </div>
+          </div>
 
           {error && (
-            <div className="bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-md px-3 py-2 mb-4">
+            <div
+              className="rounded-lg px-4 py-3 mb-5 text-sm"
+              style={{
+                background: "oklch(0.62 0.22 25 / 0.12)",
+                border: "1px solid oklch(0.62 0.22 25 / 0.3)",
+                color: "oklch(0.75 0.18 25)",
+              }}
+              data-ocid="admin.password_error_state"
+            >
               {error}
             </div>
           )}
@@ -79,19 +134,21 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
             <div className="relative">
               <input
                 type={show ? "text" : "password"}
-                placeholder="Admin password"
-                className="wfm-input pr-9"
+                placeholder="Enter admin password"
+                className="wfm-input pr-11 h-12 text-base"
                 value={pw}
                 onChange={(e) => {
                   setPw(e.target.value);
                   setError("");
                 }}
                 data-ocid="admin.password_input"
+                autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShow((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={show ? "Hide password" : "Show password"}
               >
                 {show ? (
                   <EyeOff className="w-4 h-4" />
@@ -102,12 +159,31 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
             </div>
             <button
               type="submit"
-              className="wfm-btn-primary w-full h-11"
+              disabled={loading || !pw}
+              className="wfm-btn-primary w-full h-12 text-base flex items-center justify-center gap-2"
               data-ocid="admin.password_submit_button"
             >
-              Unlock Admin Panel
+              {loading ? (
+                <>
+                  <span
+                    className="w-4 h-4 border-2 rounded-full border-t-transparent animate-spin"
+                    style={{ borderColor: "currentColor" }}
+                  />
+                  Verifying…
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  Unlock Admin Panel
+                </>
+              )}
             </button>
           </form>
+
+          <p className="text-xs text-muted-foreground text-center mt-5">
+            Default password:{" "}
+            <code className="text-primary">webfoo@admin2026</code>
+          </p>
         </div>
       </div>
     </div>
@@ -123,6 +199,145 @@ function StatusBadge({ status }: { status: OrderStatus }) {
     Delivered: "status-badge-delivered",
   };
   return <span className={map[status]}>{status}</span>;
+}
+
+// ─── Dashboard Tab ────────────────────────────────────────────────────────────
+function DashboardTab() {
+  const orders = getOrders();
+  const stores = getStores();
+  const customers = getCustomers();
+  const revenue = orders.reduce((sum, o) => sum + o.total, 0);
+
+  const stats = [
+    {
+      label: "Total Orders",
+      value: orders.length,
+      icon: ShoppingCart,
+      color: "oklch(0.72 0.17 213)",
+      bg: "oklch(0.72 0.17 213 / 0.1)",
+      border: "oklch(0.72 0.17 213 / 0.2)",
+      delay: "0ms",
+    },
+    {
+      label: "Total Revenue",
+      value: formatPrice(revenue),
+      icon: IndianRupee,
+      color: "oklch(0.7 0.18 162)",
+      bg: "oklch(0.7 0.18 162 / 0.1)",
+      border: "oklch(0.7 0.18 162 / 0.2)",
+      delay: "60ms",
+    },
+    {
+      label: "Total Stores",
+      value: stores.length,
+      icon: Store,
+      color: "oklch(0.75 0.18 303)",
+      bg: "oklch(0.75 0.18 303 / 0.1)",
+      border: "oklch(0.75 0.18 303 / 0.2)",
+      delay: "120ms",
+    },
+    {
+      label: "Total Customers",
+      value: customers.length,
+      icon: Users,
+      color: "oklch(0.8 0.18 84)",
+      bg: "oklch(0.8 0.18 84 / 0.1)",
+      border: "oklch(0.8 0.18 84 / 0.2)",
+      delay: "180ms",
+    },
+  ];
+
+  const recentOrders = [...orders]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    .slice(0, 5);
+
+  return (
+    <div className="admin-fade-up">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-foreground">Dashboard</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Welcome back, Admin. Here's what's happening.
+        </p>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {stats.map(({ label, value, icon: Icon, color, bg, border, delay }) => (
+          <div
+            key={label}
+            className="stat-card-animate rounded-xl p-5"
+            style={{
+              background: bg,
+              border: `1px solid ${border}`,
+              animationDelay: delay,
+            }}
+          >
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
+              style={{ background: bg, border: `1px solid ${border}` }}
+            >
+              <Icon className="w-5 h-5" style={{ color }} />
+            </div>
+            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-xs text-muted-foreground mt-1 font-medium">
+              {label}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Orders */}
+      <div
+        className="rounded-xl overflow-hidden"
+        style={{
+          background: "oklch(0.12 0 0)",
+          border: "1px solid oklch(0.22 0 0)",
+        }}
+      >
+        <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">
+            Recent Orders
+          </h3>
+        </div>
+        {recentOrders.length === 0 ? (
+          <div
+            className="py-10 text-center text-muted-foreground text-sm"
+            data-ocid="admin.dashboard_orders_empty_state"
+          >
+            No orders yet.
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {recentOrders.map((order, i) => (
+              <div
+                key={order.id}
+                className="flex items-center gap-4 px-5 py-3"
+                data-ocid={`admin.dashboard_order_item.${i + 1}`}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-mono text-primary truncate">
+                    {order.id}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {order.customerName} ·{" "}
+                    {new Date(order.createdAt).toLocaleDateString("en-IN")}
+                  </p>
+                </div>
+                <StatusBadge status={order.status} />
+                <span className="text-sm font-bold text-foreground">
+                  {formatPrice(order.total)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ─── Orders Tab ───────────────────────────────────────────────────────────────
@@ -165,12 +380,21 @@ function OrdersTab() {
   ];
 
   return (
-    <div>
-      <h2 className="text-lg font-bold text-foreground mb-4">Orders</h2>
+    <div className="admin-fade-up">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-foreground">Orders</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          {orders.length} total order{orders.length !== 1 ? "s" : ""}
+        </p>
+      </div>
 
       {/* Filter Tabs */}
       <div
-        className="flex gap-1.5 flex-wrap mb-5"
+        className="flex gap-1.5 flex-wrap mb-5 p-1 rounded-xl"
+        style={{
+          background: "oklch(0.12 0 0)",
+          border: "1px solid oklch(0.22 0 0)",
+        }}
         data-ocid="admin.orders_filter.tab"
       >
         {FILTERS.map((f) => (
@@ -178,155 +402,173 @@ function OrdersTab() {
             type="button"
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={
               filter === f
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground hover:text-foreground"
-            }`}
+                ? {
+                    background: "oklch(0.72 0.17 213)",
+                    color: "oklch(0.08 0 0)",
+                  }
+                : {
+                    color: "oklch(0.55 0 0)",
+                  }
+            }
           >
             {f}{" "}
-            {f === "All"
-              ? `(${orders.length})`
-              : `(${orders.filter((o) => o.status === f).length})`}
+            <span className="opacity-70">
+              (
+              {f === "All"
+                ? orders.length
+                : orders.filter((o) => o.status === f).length}
+              )
+            </span>
           </button>
         ))}
       </div>
 
-      {/* Table */}
-      <div
-        className="rounded-lg border border-border overflow-hidden"
-        data-ocid="admin.orders_table"
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-secondary text-left">
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Order ID
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Customer
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Items
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Total
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Address
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground"
+      {/* Order cards */}
+      <div className="space-y-3" data-ocid="admin.orders_table">
+        {filtered.length === 0 && (
+          <div
+            className="text-center py-10 text-muted-foreground rounded-xl"
+            style={{
+              background: "oklch(0.12 0 0)",
+              border: "1px solid oklch(0.22 0 0)",
+            }}
+            data-ocid="admin.orders_empty_state"
+          >
+            No orders found.
+          </div>
+        )}
+        {filtered.map((order, i) => (
+          <div
+            key={order.id}
+            className="rounded-xl overflow-hidden transition-all"
+            style={{
+              background: "oklch(0.12 0 0)",
+              border: `1px solid ${expanded.has(order.id) ? "oklch(0.72 0.17 213 / 0.3)" : "oklch(0.22 0 0)"}`,
+            }}
+            data-ocid={`admin.order_row.${i + 1}`}
+          >
+            {/* Row */}
+            <div className="flex items-center gap-3 p-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-primary text-sm font-bold">
+                    {order.id}
+                  </span>
+                  <StatusBadge status={order.status} />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {order.customerName} ·{" "}
+                  {new Date(order.createdAt).toLocaleDateString("en-IN")} ·{" "}
+                  <span className="text-foreground">
+                    {formatPrice(order.total)}
+                  </span>
+                </p>
+              </div>
+
+              {/* Status selector */}
+              <select
+                value={order.status}
+                onChange={(e) =>
+                  updateStatus(order.id, e.target.value as OrderStatus)
+                }
+                className="text-xs px-2 py-1.5 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring hidden sm:block"
+                style={{
+                  background: "oklch(0.16 0 0)",
+                  border: "1px solid oklch(0.28 0 0)",
+                }}
+                data-ocid={`admin.order_status_select.${i + 1}`}
+              >
+                {STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={() => toggleExpand(order.id)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                style={{ background: "oklch(0.16 0 0)" }}
+                aria-expanded={expanded.has(order.id)}
+              >
+                {expanded.has(order.id) ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+
+            {/* Expanded details */}
+            {expanded.has(order.id) && (
+              <div
+                className="px-4 pb-4 pt-0 border-t"
+                style={{ borderColor: "oklch(0.22 0 0)" }}
+              >
+                {/* Mobile status selector */}
+                <div className="sm:hidden mb-3 pt-3">
+                  <label
+                    htmlFor={`order-status-mobile-${order.id}`}
+                    className="text-xs text-muted-foreground mb-1 block"
                   >
-                    No orders found.
-                  </td>
-                </tr>
-              )}
-              {filtered.map((order, i) => (
-                <React.Fragment key={order.id}>
-                  <tr
-                    className="bg-card hover:bg-secondary/50 transition-colors"
-                    data-ocid={`admin.order_row.${i + 1}`}
+                    Update Status
+                  </label>
+                  <select
+                    id={`order-status-mobile-${order.id}`}
+                    value={order.status}
+                    onChange={(e) =>
+                      updateStatus(order.id, e.target.value as OrderStatus)
+                    }
+                    className="text-xs px-2 py-1.5 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring w-full"
+                    style={{
+                      background: "oklch(0.16 0 0)",
+                      border: "1px solid oklch(0.28 0 0)",
+                    }}
+                    data-ocid={`admin.order_status_select_mobile.${i + 1}`}
                   >
-                    <td className="px-3 py-2.5">
-                      <span className="font-mono text-primary text-xs">
-                        {order.id}
+                    {STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2 mt-3">
+                  <p className="text-xs text-muted-foreground">
+                    📍 {order.address} · 📞 {order.phone}
+                  </p>
+                  {order.items.map((item) => (
+                    <div
+                      key={`${order.id}-${item.productId}`}
+                      className="flex items-center gap-3 rounded-lg p-2"
+                      style={{ background: "oklch(0.09 0 0)" }}
+                    >
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-9 h-9 rounded object-cover bg-secondary flex-shrink-0"
+                      />
+                      <span className="text-sm text-foreground flex-1 truncate">
+                        {item.name}
                       </span>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <p className="font-medium text-foreground text-xs">
-                        {order.customerName}
-                      </p>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <button
-                        type="button"
-                        onClick={() => toggleExpand(order.id)}
-                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      >
-                        {order.items.length} item
-                        {order.items.length !== 1 ? "s" : ""}
-                        {expanded.has(order.id) ? (
-                          <ChevronDown className="w-3 h-3" />
-                        ) : (
-                          <ChevronRight className="w-3 h-3" />
-                        )}
-                      </button>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <span className="font-bold text-primary text-xs">
-                        {formatPrice(order.total)}
+                      <span className="text-xs text-muted-foreground">
+                        ×{item.qty}
                       </span>
-                    </td>
-                    <td className="px-3 py-2.5 max-w-[180px]">
-                      <p className="text-xs text-muted-foreground truncate">
-                        {order.address}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {order.phone}
-                      </p>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          updateStatus(order.id, e.target.value as OrderStatus)
-                        }
-                        className="bg-secondary border border-border rounded text-xs px-1.5 py-1 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                        data-ocid={`admin.order_status_select.${i + 1}`}
-                      >
-                        {STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                  {expanded.has(order.id) && (
-                    <tr className="bg-background">
-                      <td colSpan={6} className="px-4 py-2.5">
-                        <div className="space-y-1">
-                          {order.items.map((item) => (
-                            <div
-                              key={`${order.id}-${item.productId}`}
-                              className="flex items-center gap-3 text-xs"
-                            >
-                              <img
-                                src={item.imageUrl}
-                                alt={item.name}
-                                className="w-8 h-8 rounded object-cover bg-secondary"
-                              />
-                              <span className="text-foreground">
-                                {item.name}
-                              </span>
-                              <span className="text-muted-foreground">
-                                ×{item.qty}
-                              </span>
-                              <span className="text-primary">
-                                {formatPrice(item.price * item.qty)}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <span className="text-xs font-bold text-primary">
+                        {formatPrice(item.price * item.qty)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -344,13 +586,28 @@ function ImageUploadField({
 }) {
   const [preview, setPreview] = useState(value);
   const [mode, setMode] = useState<"url" | "file">("url");
+  const [uploading, setUploading] = useState(false);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    onChange(url);
+    setUploading(true);
+    try {
+      // Convert to a stable data URL so it persists after refresh
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target?.result as string;
+        setPreview(dataUrl);
+        onChange(dataUrl);
+        setUploading(false);
+      };
+      reader.onerror = () => {
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      setUploading(false);
+    }
   };
 
   const handleUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -358,32 +615,42 @@ function ImageUploadField({
     onChange(e.target.value);
   };
 
-  const inputId = `img-upload-${label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div>
-      <p className="block text-sm font-medium text-foreground mb-1.5">
-        {label}
-      </p>
-      <div className="flex gap-2 mb-2">
+      <p className="block text-sm font-medium text-foreground mb-2">{label}</p>
+      <div
+        className="flex gap-1.5 mb-2 p-1 rounded-lg w-fit"
+        style={{ background: "oklch(0.1 0 0)" }}
+      >
         <button
           type="button"
           onClick={() => setMode("url")}
-          className={`px-2 py-1 rounded text-xs ${mode === "url" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
+          className="px-3 py-1 rounded-md text-xs font-medium transition-all"
+          style={
+            mode === "url"
+              ? { background: "oklch(0.72 0.17 213)", color: "oklch(0.08 0 0)" }
+              : { color: "oklch(0.55 0 0)" }
+          }
         >
           URL
         </button>
         <button
           type="button"
           onClick={() => setMode("file")}
-          className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${mode === "file" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
-          data-ocid="admin.store_upload_button"
+          className="px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1 transition-all"
+          style={
+            mode === "file"
+              ? { background: "oklch(0.72 0.17 213)", color: "oklch(0.08 0 0)" }
+              : { color: "oklch(0.55 0 0)" }
+          }
+          data-ocid="admin.image_upload_button"
         >
-          <Upload className="w-3 h-3" /> File
+          <Upload className="w-3 h-3" /> Upload
         </button>
       </div>
+
       {mode === "url" ? (
         <input
-          id={inputId}
           type="url"
           placeholder="https://..."
           className="wfm-input text-sm"
@@ -391,20 +658,52 @@ function ImageUploadField({
           onChange={handleUrl}
         />
       ) : (
-        <input
-          type="file"
-          accept="image/*"
-          className="wfm-input text-sm file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:bg-primary/20 file:text-primary file:text-xs cursor-pointer"
-          onChange={handleFile}
-          data-ocid="admin.store_upload_button"
-        />
+        <label
+          className="flex items-center justify-center gap-2 w-full h-24 rounded-xl cursor-pointer transition-all"
+          style={{
+            background: "oklch(0.1 0 0)",
+            border: "2px dashed oklch(0.28 0 0)",
+          }}
+          data-ocid="admin.image_dropzone"
+        >
+          {uploading ? (
+            <span className="text-sm text-muted-foreground">Uploading…</span>
+          ) : (
+            <>
+              <Upload className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Click to select image
+              </span>
+            </>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={handleFile}
+            data-ocid="admin.store_upload_button"
+          />
+        </label>
       )}
+
       {preview && (
-        <img
-          src={preview}
-          alt="preview"
-          className="mt-2 w-24 h-16 object-cover rounded border border-border"
-        />
+        <div className="mt-2 flex items-center gap-3">
+          <img
+            src={preview}
+            alt="preview"
+            className="w-20 h-14 object-cover rounded-lg border border-border"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setPreview("");
+              onChange("");
+            }}
+            className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
+          >
+            <X className="w-3.5 h-3.5" /> Remove
+          </button>
+        </div>
       )}
     </div>
   );
@@ -464,13 +763,18 @@ function ManageStoresTab() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-foreground">Manage Stores</h2>
+    <div className="admin-fade-up">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Manage Stores</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {stores.length} store{stores.length !== 1 ? "s" : ""} active
+          </p>
+        </div>
         <button
           type="button"
           onClick={openAdd}
-          className="wfm-btn-primary flex items-center gap-1.5 text-sm px-3 py-2"
+          className="wfm-btn-primary flex items-center gap-1.5 text-sm px-4 py-2"
           data-ocid="admin.add_store_button"
         >
           <Plus className="w-4 h-4" />
@@ -478,13 +782,20 @@ function ManageStoresTab() {
         </button>
       </div>
 
-      {/* Form */}
+      {/* Add/Edit Form */}
       {showForm && (
-        <div className="wfm-card p-4 mb-4">
-          <h3 className="text-sm font-semibold text-foreground mb-3">
+        <div
+          className="rounded-xl p-5 mb-6"
+          style={{
+            background: "oklch(0.12 0 0)",
+            border: "1px solid oklch(0.72 0.17 213 / 0.25)",
+          }}
+        >
+          <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <Store className="w-4 h-4 text-primary" />
             {editId ? "Edit Store" : "New Store"}
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="store-form-name"
@@ -495,7 +806,7 @@ function ManageStoresTab() {
               <input
                 id="store-form-name"
                 type="text"
-                className="wfm-input text-sm"
+                className="wfm-input"
                 placeholder="e.g., Bakery"
                 value={form.name}
                 onChange={(e) =>
@@ -509,20 +820,21 @@ function ManageStoresTab() {
               value={form.imageUrl}
               onChange={(url) => setForm((p) => ({ ...p, imageUrl: url }))}
             />
-            <div className="flex gap-2 pt-1">
+            <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={handleSave}
-                className="wfm-btn-primary flex items-center gap-1.5 text-sm px-3 py-2"
+                className="wfm-btn-primary flex items-center gap-1.5 text-sm px-4 py-2"
                 data-ocid="admin.store_form_save_button"
               >
                 <Save className="w-3.5 h-3.5" />
-                {editId ? "Update" : "Create"}
+                {editId ? "Update Store" : "Create Store"}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="wfm-btn-secondary flex items-center gap-1.5 text-sm px-3 py-2"
+                className="wfm-btn-secondary flex items-center gap-1.5 text-sm px-4 py-2"
+                data-ocid="admin.store_form_cancel_button"
               >
                 <X className="w-3.5 h-3.5" />
                 Cancel
@@ -534,7 +846,13 @@ function ManageStoresTab() {
 
       {/* Confirm Delete */}
       {deleteId && (
-        <div className="wfm-card p-4 mb-4 border-destructive/30 bg-destructive/5">
+        <div
+          className="rounded-xl p-4 mb-6"
+          style={{
+            background: "oklch(0.62 0.22 25 / 0.08)",
+            border: "1px solid oklch(0.62 0.22 25 / 0.3)",
+          }}
+        >
           <p className="text-sm text-foreground mb-3">
             Delete &quot;{stores.find((s) => s.id === deleteId)?.name}&quot;?
             This cannot be undone.
@@ -543,14 +861,20 @@ function ManageStoresTab() {
             <button
               type="button"
               onClick={() => handleDelete(deleteId)}
-              className="bg-destructive text-destructive-foreground text-sm px-3 py-1.5 rounded-md"
+              className="text-sm px-4 py-2 rounded-lg font-semibold"
+              style={{
+                background: "oklch(0.62 0.22 25)",
+                color: "oklch(0.97 0 0)",
+              }}
+              data-ocid="admin.store_delete_confirm_button"
             >
               Delete
             </button>
             <button
               type="button"
               onClick={() => setDeleteId(null)}
-              className="wfm-btn-secondary text-sm px-3 py-1.5"
+              className="wfm-btn-secondary text-sm px-4 py-2"
+              data-ocid="admin.store_delete_cancel_button"
             >
               Cancel
             </button>
@@ -558,38 +882,56 @@ function ManageStoresTab() {
         </div>
       )}
 
-      {/* List */}
-      <div className="space-y-2" data-ocid="admin.stores_list">
+      {/* Store Card Grid */}
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        data-ocid="admin.stores_list"
+      >
         {stores.map((store, i) => (
           <div
             key={store.id}
-            className="wfm-card p-3 flex items-center gap-3"
+            className="rounded-xl overflow-hidden group"
+            style={{
+              background: "oklch(0.12 0 0)",
+              border: "1px solid oklch(0.22 0 0)",
+            }}
             data-ocid={`admin.store_item.${i + 1}`}
           >
-            <img
-              src={store.imageUrl}
-              alt={store.name}
-              className="w-12 h-9 object-cover rounded"
-            />
-            <span className="flex-1 text-sm font-medium text-foreground">
-              {store.name}
-            </span>
-            <button
-              type="button"
-              onClick={() => openEdit(store)}
-              className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
-              data-ocid={`admin.store_edit_button.${i + 1}`}
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setDeleteId(store.id)}
-              className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
-              data-ocid={`admin.store_delete_button.${i + 1}`}
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+            <div className="relative aspect-video overflow-hidden">
+              <img
+                src={store.imageUrl}
+                alt={store.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+            </div>
+            <div className="p-3 flex items-center justify-between">
+              <p className="text-sm font-semibold text-foreground truncate flex-1">
+                {store.name}
+              </p>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => openEdit(store)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
+                  style={{ background: "oklch(0.16 0 0)" }}
+                  data-ocid={`admin.store_edit_button.${i + 1}`}
+                  title="Edit store"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(store.id)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                  style={{ background: "oklch(0.16 0 0)" }}
+                  data-ocid={`admin.store_delete_button.${i + 1}`}
+                  title="Delete store"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -695,9 +1037,15 @@ function ManageProductsTab() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-        <h2 className="text-lg font-bold text-foreground">Manage Products</h2>
+    <div className="admin-fade-up">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Manage Products</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {storeProducts.length} product
+            {storeProducts.length !== 1 ? "s" : ""} in selected store
+          </p>
+        </div>
         <div className="flex items-center gap-3">
           <select
             value={selectedStoreId}
@@ -705,7 +1053,11 @@ function ManageProductsTab() {
               setSelectedStoreId(e.target.value);
               setShowForm(false);
             }}
-            className="bg-secondary border border-border rounded text-sm px-2 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            className="text-sm px-3 py-2 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            style={{
+              background: "oklch(0.16 0 0)",
+              border: "1px solid oklch(0.28 0 0)",
+            }}
             data-ocid="admin.products_store_select"
           >
             {stores.map((s) => (
@@ -717,7 +1069,7 @@ function ManageProductsTab() {
           <button
             type="button"
             onClick={openAdd}
-            className="wfm-btn-primary flex items-center gap-1.5 text-sm px-3 py-2"
+            className="wfm-btn-primary flex items-center gap-1.5 text-sm px-4 py-2"
             data-ocid="admin.add_product_button"
           >
             <Plus className="w-4 h-4" />
@@ -728,23 +1080,30 @@ function ManageProductsTab() {
 
       {/* Form */}
       {showForm && (
-        <div className="wfm-card p-4 mb-4">
-          <h3 className="text-sm font-semibold text-foreground mb-3">
+        <div
+          className="rounded-xl p-5 mb-6"
+          style={{
+            background: "oklch(0.12 0 0)",
+            border: "1px solid oklch(0.72 0.17 213 / 0.25)",
+          }}
+        >
+          <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
             {editId ? "Edit Product" : "New Product"}
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label
                   htmlFor="product-form-name"
-                  className="block text-xs font-medium text-foreground mb-1"
+                  className="block text-xs font-medium text-foreground mb-1.5"
                 >
-                  Name
+                  Product Name
                 </label>
                 <input
                   id="product-form-name"
                   type="text"
-                  className="wfm-input text-sm"
+                  className="wfm-input"
                   placeholder="Product name"
                   value={form.name}
                   onChange={(e) =>
@@ -756,14 +1115,14 @@ function ManageProductsTab() {
               <div>
                 <label
                   htmlFor="product-form-price"
-                  className="block text-xs font-medium text-foreground mb-1"
+                  className="block text-xs font-medium text-foreground mb-1.5"
                 >
                   Price (₹)
                 </label>
                 <input
                   id="product-form-price"
                   type="number"
-                  className="wfm-input text-sm"
+                  className="wfm-input"
                   placeholder="0"
                   min="0"
                   step="0.01"
@@ -778,19 +1137,20 @@ function ManageProductsTab() {
             <div>
               <label
                 htmlFor="product-form-desc"
-                className="block text-xs font-medium text-foreground mb-1"
+                className="block text-xs font-medium text-foreground mb-1.5"
               >
                 Description
               </label>
               <textarea
                 id="product-form-desc"
                 rows={2}
-                className="wfm-input text-sm resize-none"
+                className="wfm-input resize-none"
                 placeholder="Product description"
                 value={form.description}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, description: e.target.value }))
                 }
+                data-ocid="admin.product_form_desc_textarea"
               />
             </div>
             <ImageUploadField
@@ -798,34 +1158,48 @@ function ManageProductsTab() {
               value={form.imageUrl}
               onChange={(url) => setForm((p) => ({ ...p, imageUrl: url }))}
             />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setForm((p) => ({ ...p, inStock: !p.inStock }))}
-                className={`relative inline-flex w-9 h-5 rounded-full transition-colors ${form.inStock ? "bg-primary" : "bg-secondary border border-border"}`}
+                className="relative inline-flex w-10 h-5.5 rounded-full transition-colors flex-shrink-0"
+                style={{
+                  background: form.inStock
+                    ? "oklch(0.72 0.17 213)"
+                    : "oklch(0.22 0 0)",
+                  minWidth: "40px",
+                  height: "22px",
+                }}
+                data-ocid="admin.product_form_instock_toggle"
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${form.inStock ? "translate-x-4" : "translate-x-0"}`}
+                  className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform"
+                  style={{
+                    transform: form.inStock
+                      ? "translateX(18px)"
+                      : "translateX(0)",
+                  }}
                 />
               </button>
               <span className="text-sm text-foreground">
                 {form.inStock ? "In Stock" : "Out of Stock"}
               </span>
             </div>
-            <div className="flex gap-2 pt-1">
+            <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={handleSave}
-                className="wfm-btn-primary flex items-center gap-1.5 text-sm px-3 py-2"
+                className="wfm-btn-primary flex items-center gap-1.5 text-sm px-4 py-2"
                 data-ocid="admin.product_form_save_button"
               >
                 <Save className="w-3.5 h-3.5" />
-                {editId ? "Update" : "Create"}
+                {editId ? "Update Product" : "Create Product"}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="wfm-btn-secondary text-sm px-3 py-2"
+                className="wfm-btn-secondary text-sm px-4 py-2"
+                data-ocid="admin.product_form_cancel_button"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -836,7 +1210,13 @@ function ManageProductsTab() {
 
       {/* Confirm Delete */}
       {deleteId && (
-        <div className="wfm-card p-4 mb-4 border-destructive/30 bg-destructive/5">
+        <div
+          className="rounded-xl p-4 mb-6"
+          style={{
+            background: "oklch(0.62 0.22 25 / 0.08)",
+            border: "1px solid oklch(0.62 0.22 25 / 0.3)",
+          }}
+        >
           <p className="text-sm text-foreground mb-3">
             Delete &quot;{products.find((p) => p.id === deleteId)?.name}&quot;?
           </p>
@@ -844,14 +1224,20 @@ function ManageProductsTab() {
             <button
               type="button"
               onClick={() => handleDelete(deleteId)}
-              className="bg-destructive text-destructive-foreground text-sm px-3 py-1.5 rounded-md"
+              className="text-sm px-4 py-2 rounded-lg font-semibold"
+              style={{
+                background: "oklch(0.62 0.22 25)",
+                color: "oklch(0.97 0 0)",
+              }}
+              data-ocid="admin.product_delete_confirm_button"
             >
               Delete
             </button>
             <button
               type="button"
               onClick={() => setDeleteId(null)}
-              className="wfm-btn-secondary text-sm px-3 py-1.5"
+              className="wfm-btn-secondary text-sm px-4 py-2"
+              data-ocid="admin.product_delete_cancel_button"
             >
               Cancel
             </button>
@@ -859,63 +1245,110 @@ function ManageProductsTab() {
         </div>
       )}
 
-      {/* Products List */}
+      {/* Products Grid */}
       {storeProducts.length === 0 ? (
         <div
-          className="text-center py-10 text-muted-foreground"
+          className="text-center py-16 rounded-xl text-muted-foreground"
+          style={{
+            background: "oklch(0.12 0 0)",
+            border: "1px solid oklch(0.22 0 0)",
+          }}
           data-ocid="admin.products_list_empty_state"
         >
-          No products in this store yet.
+          <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <p>No products in this store yet.</p>
         </div>
       ) : (
-        <div className="space-y-2" data-ocid="admin.products_list">
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+          data-ocid="admin.products_list"
+        >
           {storeProducts.map((product, i) => (
             <div
               key={product.id}
-              className="wfm-card p-3 flex items-center gap-3"
+              className="rounded-xl overflow-hidden"
+              style={{
+                background: "oklch(0.12 0 0)",
+                border: "1px solid oklch(0.22 0 0)",
+              }}
               data-ocid={`admin.product_item.${i + 1}`}
             >
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-10 h-10 object-cover rounded"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
+              <div className="relative aspect-square overflow-hidden">
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+                {!product.inStock && (
+                  <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                    <span
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
+                      style={{
+                        background: "oklch(0.62 0.22 25 / 0.9)",
+                        color: "oklch(0.97 0 0)",
+                      }}
+                    >
+                      Out of Stock
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="p-3">
+                <p className="text-xs font-semibold text-foreground truncate mb-0.5">
                   {product.name}
                 </p>
-                <p className="text-xs text-primary">
+                <p className="text-sm font-bold text-primary mb-2">
                   {formatPrice(product.price)}
                 </p>
+                <div className="flex items-center justify-between">
+                  {/* Stock toggle */}
+                  <button
+                    type="button"
+                    onClick={() => toggleStock(product.id)}
+                    className="relative inline-flex rounded-full transition-colors flex-shrink-0"
+                    style={{
+                      background: product.inStock
+                        ? "oklch(0.72 0.17 213)"
+                        : "oklch(0.22 0 0)",
+                      minWidth: "32px",
+                      height: "18px",
+                    }}
+                    data-ocid={`admin.product_stock_toggle.${i + 1}`}
+                    title={
+                      product.inStock ? "Mark Out of Stock" : "Mark In Stock"
+                    }
+                  >
+                    <span
+                      className="absolute top-0.5 left-0.5 w-3.5 h-3.5 rounded-full bg-white transition-transform"
+                      style={{
+                        transform: product.inStock
+                          ? "translateX(14px)"
+                          : "translateX(0)",
+                      }}
+                    />
+                  </button>
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(product)}
+                      className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-primary transition-colors"
+                      style={{ background: "oklch(0.16 0 0)" }}
+                      data-ocid={`admin.product_edit_button.${i + 1}`}
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteId(product.id)}
+                      className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                      style={{ background: "oklch(0.16 0 0)" }}
+                      data-ocid={`admin.product_delete_button.${i + 1}`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
               </div>
-              {/* Stock Toggle */}
-              <button
-                type="button"
-                onClick={() => toggleStock(product.id)}
-                className={`relative inline-flex w-8 h-4.5 rounded-full transition-colors flex-shrink-0 ${product.inStock ? "bg-primary" : "bg-secondary border border-border"}`}
-                style={{ minWidth: "32px", height: "18px" }}
-                data-ocid={`admin.product_stock_toggle.${i + 1}`}
-                title={product.inStock ? "Mark Out of Stock" : "Mark In Stock"}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 rounded-full bg-white transition-transform ${product.inStock ? "translate-x-3.5" : "translate-x-0"}`}
-                />
-              </button>
-              <button
-                type="button"
-                onClick={() => openEdit(product)}
-                className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeleteId(product.id)}
-                className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
-                data-ocid={`admin.product_delete_button.${i + 1}`}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
             </div>
           ))}
         </div>
@@ -948,257 +1381,299 @@ function CustomersTab() {
   };
 
   return (
-    <div>
-      <h2 className="text-lg font-bold text-foreground mb-4">Customers</h2>
+    <div className="admin-fade-up">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-foreground">Customers</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          {customers.length} registered customer
+          {customers.length !== 1 ? "s" : ""}
+        </p>
+      </div>
 
-      <div
-        className="rounded-lg border border-border overflow-hidden"
-        data-ocid="admin.customers_table"
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-secondary text-left">
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  #
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Name
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Mobile
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Password
-                </th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
-                  Orders
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {customers.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="text-center py-8 text-muted-foreground"
+      <div className="space-y-3" data-ocid="admin.customers_table">
+        {customers.length === 0 && (
+          <div
+            className="text-center py-10 text-muted-foreground rounded-xl"
+            style={{
+              background: "oklch(0.12 0 0)",
+              border: "1px solid oklch(0.22 0 0)",
+            }}
+            data-ocid="admin.customers_empty_state"
+          >
+            <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p>No customers registered.</p>
+          </div>
+        )}
+        {customers.map((customer, i) => {
+          const customerOrders = orders.filter(
+            (o) => o.customerId === customer.id,
+          );
+          const totalSpent = customerOrders.reduce((s, o) => s + o.total, 0);
+
+          return (
+            <div
+              key={customer.id}
+              className="rounded-xl overflow-hidden"
+              style={{
+                background: "oklch(0.12 0 0)",
+                border: `1px solid ${expanded.has(customer.id) ? "oklch(0.72 0.17 213 / 0.3)" : "oklch(0.22 0 0)"}`,
+              }}
+              data-ocid={`admin.customer_row.${i + 1}`}
+            >
+              <div className="flex items-center gap-4 p-4">
+                {/* Avatar */}
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                  style={{
+                    background: "oklch(0.72 0.17 213 / 0.15)",
+                    color: "oklch(0.72 0.17 213)",
+                    border: "1px solid oklch(0.72 0.17 213 / 0.25)",
+                  }}
+                >
+                  {customer.name.charAt(0).toUpperCase()}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">
+                    {customer.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    📱 {customer.mobile} · {customerOrders.length} order
+                    {customerOrders.length !== 1 ? "s" : ""} ·{" "}
+                    {formatPrice(totalSpent)} spent
+                  </p>
+                </div>
+
+                {/* Password */}
+                <div className="flex items-center gap-1.5 hidden sm:flex">
+                  <span
+                    className="text-xs font-mono"
+                    style={{ color: "oklch(0.55 0 0)" }}
                   >
-                    No customers registered.
-                  </td>
-                </tr>
-              )}
-              {customers.map((customer, i) => {
-                const customerOrders = orders.filter(
-                  (o) => o.customerId === customer.id,
-                );
-                return (
-                  <React.Fragment key={customer.id}>
-                    <tr
-                      className="bg-card hover:bg-secondary/50 transition-colors"
-                      data-ocid={`admin.customer_row.${i + 1}`}
-                    >
-                      <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                        {i + 1}
-                      </td>
-                      <td className="px-3 py-2.5">
-                        <p className="font-medium text-foreground text-xs">
-                          {customer.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate max-w-[150px]">
-                          {customer.address || "—"}
-                        </p>
-                      </td>
-                      <td className="px-3 py-2.5 text-xs text-foreground">
-                        {customer.mobile}
-                      </td>
-                      <td className="px-3 py-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-mono text-muted-foreground">
-                            {showPw.has(customer.id)
-                              ? customer.password
-                              : "•".repeat(customer.password.length)}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => togglePw(customer.id)}
-                            className="text-muted-foreground hover:text-foreground"
-                            data-ocid={`admin.customer_password_toggle.${i + 1}`}
-                          >
-                            {showPw.has(customer.id) ? (
-                              <EyeOff className="w-3.5 h-3.5" />
-                            ) : (
-                              <Eye className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-3 py-2.5">
-                        <button
-                          type="button"
-                          onClick={() => toggleExpand(customer.id)}
-                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                        >
-                          {customerOrders.length} order
-                          {customerOrders.length !== 1 ? "s" : ""}
-                          {expanded.has(customer.id) ? (
-                            <ChevronDown className="w-3 h-3" />
-                          ) : (
-                            <ChevronRight className="w-3 h-3" />
-                          )}
-                        </button>
-                      </td>
-                    </tr>
-                    {expanded.has(customer.id) && (
-                      <tr className="bg-background">
-                        <td colSpan={5} className="px-4 py-2.5">
-                          {customerOrders.length === 0 ? (
-                            <p className="text-xs text-muted-foreground">
-                              No orders yet.
-                            </p>
-                          ) : (
-                            <div className="space-y-2">
-                              {customerOrders.map((order) => (
-                                <div
-                                  key={order.id}
-                                  className="flex items-center gap-3 text-xs border border-border rounded p-2"
-                                >
-                                  <span className="font-mono text-primary">
-                                    {order.id}
-                                  </span>
-                                  <span className="text-muted-foreground">
-                                    {new Date(
-                                      order.createdAt,
-                                    ).toLocaleDateString("en-IN")}
-                                  </span>
-                                  <span className="text-foreground">
-                                    {order.items.length} item
-                                    {order.items.length !== 1 ? "s" : ""}
-                                  </span>
-                                  <span className="text-primary font-bold">
-                                    {formatPrice(order.total)}
-                                  </span>
-                                  <StatusBadge status={order.status} />
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
+                    {showPw.has(customer.id)
+                      ? customer.password
+                      : "•".repeat(Math.min(customer.password.length, 8))}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => togglePw(customer.id)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    data-ocid={`admin.customer_password_toggle.${i + 1}`}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPw.has(customer.id) ? (
+                      <EyeOff className="w-3.5 h-3.5" />
+                    ) : (
+                      <Eye className="w-3.5 h-3.5" />
                     )}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => toggleExpand(customer.id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors text-muted-foreground hover:text-foreground flex-shrink-0"
+                  style={{ background: "oklch(0.16 0 0)" }}
+                  aria-expanded={expanded.has(customer.id)}
+                >
+                  {expanded.has(customer.id) ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              {/* Expanded orders */}
+              {expanded.has(customer.id) && (
+                <div
+                  className="px-4 pb-4 border-t"
+                  style={{ borderColor: "oklch(0.22 0 0)" }}
+                >
+                  {/* Mobile password */}
+                  <div className="sm:hidden flex items-center gap-1.5 pt-3 mb-3">
+                    <span className="text-xs text-muted-foreground">
+                      Password:
+                    </span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {showPw.has(customer.id)
+                        ? customer.password
+                        : "•".repeat(Math.min(customer.password.length, 8))}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => togglePw(customer.id)}
+                      className="text-muted-foreground"
+                      data-ocid={`admin.customer_password_toggle_mobile.${i + 1}`}
+                    >
+                      {showPw.has(customer.id) ? (
+                        <EyeOff className="w-3.5 h-3.5" />
+                      ) : (
+                        <Eye className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+
+                  {customer.address && (
+                    <p className="text-xs text-muted-foreground pt-3 mb-3">
+                      📍 {customer.address}
+                    </p>
+                  )}
+                  {customerOrders.length === 0 ? (
+                    <p className="text-xs text-muted-foreground py-2">
+                      No orders yet.
+                    </p>
+                  ) : (
+                    <div className="space-y-2 mt-2">
+                      {customerOrders.map((order) => (
+                        <div
+                          key={order.id}
+                          className="flex items-center gap-3 text-xs rounded-lg p-2"
+                          style={{ background: "oklch(0.09 0 0)" }}
+                        >
+                          <span className="font-mono text-primary">
+                            {order.id}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {new Date(order.createdAt).toLocaleDateString(
+                              "en-IN",
+                            )}
+                          </span>
+                          <span className="text-foreground">
+                            {order.items.length} item
+                            {order.items.length !== 1 ? "s" : ""}
+                          </span>
+                          <span className="text-primary font-bold">
+                            {formatPrice(order.total)}
+                          </span>
+                          <StatusBadge status={order.status} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ─── Admin Dashboard ──────────────────────────────────────────────────────────
-type Tab = "orders" | "stores" | "products" | "customers";
+// ─── Admin Dashboard (Command Center) ────────────────────────────────────────
+type Tab = "dashboard" | "orders" | "stores" | "products" | "customers";
 
 const TAB_CONFIG: Array<{ id: Tab; label: string; icon: React.ElementType }> = [
-  { id: "orders", label: "Orders", icon: Package },
-  { id: "stores", label: "Manage Stores", icon: Store },
-  { id: "products", label: "Manage Products", icon: ShoppingBag },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "orders", label: "Orders", icon: ShoppingCart },
+  { id: "stores", label: "Stores", icon: Store },
+  { id: "products", label: "Products", icon: ShoppingBag },
   { id: "customers", label: "Customers", icon: Users },
 ];
 
 function AdminDashboard() {
-  const [tab, setTab] = useState<Tab>("orders");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [tab, setTab] = useState<Tab>("dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     sessionStorage.removeItem(ADMIN_AUTH_KEY);
     window.location.reload();
   };
 
+  const currentTab = TAB_CONFIG.find((t) => t.id === tab);
+
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Sidebar */}
-      <aside
-        className={`
-        fixed inset-y-0 left-0 z-30 w-56 bg-sidebar border-r border-sidebar-border flex flex-col
-        transform transition-transform duration-200
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        md:relative md:translate-x-0 md:flex
-      `}
+    <div className="min-h-screen" style={{ background: "oklch(0.08 0 0)" }}>
+      {/* Top Command Bar */}
+      <header
+        className="sticky top-0 z-30 flex items-center gap-4 px-4 md:px-6"
+        style={{
+          height: "60px",
+          background: "oklch(0.10 0 0 / 0.9)",
+          borderBottom: "1px solid oklch(0.20 0 0)",
+          backdropFilter: "blur(12px)",
+        }}
       >
-        {/* Header */}
-        <div className="px-4 py-4 border-b border-sidebar-border flex items-center gap-2">
+        {/* Logo */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           <WFLogo size="sm" showLabel={false} />
-          <div>
-            <p className="text-xs font-bold text-foreground">WebFoo Mart</p>
-            <p className="text-[10px] text-muted-foreground">Admin Panel</p>
+          <div className="hidden md:block">
+            <p className="text-xs font-bold text-foreground leading-tight">
+              WebFoo Mart
+            </p>
+            <p
+              className="text-[10px] uppercase tracking-wider leading-tight"
+              style={{ color: "oklch(0.72 0.17 213 / 0.8)" }}
+            >
+              Admin
+            </p>
           </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 p-3 space-y-0.5">
+        {/* Divider */}
+        <div
+          className="hidden md:block w-px h-6 flex-shrink-0"
+          style={{ background: "oklch(0.22 0 0)" }}
+        />
+
+        {/* Tab Navigation (desktop) */}
+        <nav className="hidden md:flex items-center gap-1 flex-1">
           {TAB_CONFIG.map(({ id, label, icon: Icon }) => (
             <button
               type="button"
               key={id}
-              onClick={() => {
-                setTab(id);
-                setSidebarOpen(false);
-              }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              onClick={() => setTab(id)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={
                 tab === id
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent"
-              }`}
+                  ? {
+                      background: "oklch(0.72 0.17 213 / 0.15)",
+                      color: "oklch(0.72 0.17 213)",
+                      border: "1px solid oklch(0.72 0.17 213 / 0.3)",
+                    }
+                  : {
+                      color: "oklch(0.55 0 0)",
+                      border: "1px solid transparent",
+                    }
+              }
               data-ocid={`admin.${id}_tab`}
             >
-              <Icon className="w-4 h-4 flex-shrink-0" />
+              <Icon className="w-3.5 h-3.5" />
               {label}
             </button>
           ))}
         </nav>
 
-        {/* Logout */}
-        <div className="p-3 border-t border-sidebar-border">
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="w-full text-xs text-muted-foreground hover:text-foreground px-3 py-2 rounded-md hover:bg-sidebar-accent transition-colors"
-          >
-            Logout
-          </button>
+        {/* Mobile tab label */}
+        <div className="md:hidden flex-1 flex items-center gap-2">
+          {currentTab && (
+            <>
+              <currentTab.icon className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">
+                {currentTab.label}
+              </span>
+            </>
+          )}
         </div>
-      </aside>
 
-      {/* Overlay */}
-      {sidebarOpen && (
-        <button
-          type="button"
-          className="fixed inset-0 z-20 bg-background/50 md:hidden w-full h-full border-0 p-0"
-          onClick={() => setSidebarOpen(false)}
-          aria-label="Close sidebar"
-        />
-      )}
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
+        {/* Right controls */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Mobile hamburger */}
           <button
             type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="Open sidebar"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+            style={{ background: "oklch(0.14 0 0)" }}
+            aria-label="Open menu"
           >
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              role="img"
-              aria-label="Menu"
+              aria-hidden="true"
             >
-              <title>Menu</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -1207,19 +1682,86 @@ function AdminDashboard() {
               />
             </svg>
           </button>
-          <span className="text-sm font-bold text-foreground">
-            {TAB_CONFIG.find((t) => t.id === tab)?.label}
-          </span>
-        </div>
 
-        {/* Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
-          {tab === "orders" && <OrdersTab />}
-          {tab === "stores" && <ManageStoresTab />}
-          {tab === "products" && <ManageProductsTab />}
-          {tab === "customers" && <CustomersTab />}
-        </main>
-      </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg transition-colors"
+            style={{ background: "oklch(0.14 0 0)" }}
+            data-ocid="admin.logout_button"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Logout
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile dropdown nav */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <button
+            type="button"
+            className="fixed inset-0 z-20 w-full h-full border-0 p-0"
+            style={{ background: "oklch(0 0 0 / 0.5)" }}
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close menu"
+          />
+          <div
+            className="fixed top-[60px] left-0 right-0 z-30 mx-4 mt-2 rounded-xl overflow-hidden"
+            style={{
+              background: "oklch(0.13 0 0)",
+              border: "1px solid oklch(0.22 0 0)",
+              boxShadow: "0 16px 40px oklch(0 0 0 / 0.5)",
+            }}
+          >
+            {TAB_CONFIG.map(({ id, label, icon: Icon }) => (
+              <button
+                type="button"
+                key={id}
+                onClick={() => {
+                  setTab(id);
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors text-left"
+                style={
+                  tab === id
+                    ? {
+                        color: "oklch(0.72 0.17 213)",
+                        background: "oklch(0.72 0.17 213 / 0.08)",
+                      }
+                    : { color: "oklch(0.65 0 0)" }
+                }
+                data-ocid={`admin.${id}_mobile_tab`}
+              >
+                <Icon className="w-4 h-4 flex-shrink-0" />
+                {label}
+              </button>
+            ))}
+            <div style={{ borderTop: "1px solid oklch(0.22 0 0)" }}>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-left"
+                style={{ color: "oklch(0.65 0.18 25)" }}
+                data-ocid="admin.logout_mobile_button"
+              >
+                <LogOut className="w-4 h-4 flex-shrink-0" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Main content */}
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 page-enter">
+        {tab === "dashboard" && <DashboardTab />}
+        {tab === "orders" && <OrdersTab />}
+        {tab === "stores" && <ManageStoresTab />}
+        {tab === "products" && <ManageProductsTab />}
+        {tab === "customers" && <CustomersTab />}
+      </main>
     </div>
   );
 }

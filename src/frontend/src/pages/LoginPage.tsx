@@ -36,9 +36,12 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen flex items-center justify-center px-4 py-12 page-enter">
       <div className="w-full max-w-sm">
-        <div className="flex justify-center mb-8">
+        <div
+          className="flex justify-center mb-8 glow-pulse"
+          style={{ borderRadius: "50%", padding: "4px" }}
+        >
           <WFLogo size="md" showLabel={false} />
         </div>
 

@@ -38,7 +38,7 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen pb-24">
+    <main className="min-h-screen pb-24 page-enter">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <h1 className="text-xl font-bold text-foreground mb-6">
           Shopping Cart

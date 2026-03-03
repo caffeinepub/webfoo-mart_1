@@ -95,4 +95,175 @@
   .wfm-input {
     @apply bg-input border border-border rounded-md px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring w-full text-sm;
   }
+
+  /* Status badges for admin panel */
+  .status-badge-pending {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/15 text-yellow-400 border border-yellow-500/25;
+  }
+  .status-badge-processing {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/25;
+  }
+  .status-badge-shipped {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/25;
+  }
+  .status-badge-delivered {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
+  }
+}
+
+/* ── Gold accent tokens ──────────────────────────────────────────────── */
+:root {
+  --gold: oklch(0.82 0.15 85);
+  --gold-muted: oklch(0.82 0.15 85 / 0.15);
+}
+
+.text-gold { color: oklch(0.82 0.15 85); }
+.border-gold { border-color: oklch(0.82 0.15 85); }
+.bg-gold-muted { background: oklch(0.82 0.15 85 / 0.15); }
+
+/* ── Card Pop Animation ──────────────────────────────────────────────── */
+@keyframes card-pop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(0.93); }
+  55%  { transform: scale(1.06); }
+  75%  { transform: scale(0.97); }
+  90%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.card-pop-active {
+  animation: card-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Page fade-in ────────────────────────────────────────────────────── */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: page-fade-in 0.4s ease both;
+}
+
+/* Stagger helpers */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.30s; }
+
+/* Card reveal for grids */
+@keyframes card-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.card-reveal {
+  animation: card-reveal 0.35s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+/* Hero logo float */
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+.logo-float {
+  animation: logo-float 3s ease-in-out infinite;
+}
+
+/* Glow pulse on primary elements */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.72 0.17 213 / 0.3); }
+  50%       { box-shadow: 0 0 16px 4px oklch(0.72 0.17 213 / 0.2); }
+}
+.glow-pulse {
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+/* Shimmer for hero text */
+@keyframes shimmer-move {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer-text {
+  background: linear-gradient(90deg, oklch(0.72 0.17 213), oklch(0.82 0.15 85), oklch(0.72 0.17 213));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-move 3s linear infinite;
+}
+
+/* Bounce-in for modal checkmark */
+@keyframes bounce-in {
+  0%   { transform: scale(0); }
+  50%  { transform: scale(1.25); }
+  75%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Order Confirmation Modal ──────────────────────────────────────────── */
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modal-scale-in {
+  from { opacity: 0; transform: scale(0.85) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes checkmark-scale-in {
+  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+  60%  { transform: scale(1.2) rotate(5deg); opacity: 1; }
+  80%  { transform: scale(0.95) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0   oklch(0.7 0.18 162 / 0.5); }
+  70%  { box-shadow: 0 0 0 14px oklch(0.7 0.18 162 / 0); }
+  100% { box-shadow: 0 0 0 0   oklch(0.7 0.18 162 / 0); }
+}
+
+.modal-backdrop {
+  animation: modal-backdrop-in 0.2s ease both;
+}
+.modal-card {
+  animation: modal-scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.checkmark-animate {
+  animation: checkmark-scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+.pulse-ring {
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+/* ── Admin Panel Command Center ────────────────────────────────────────── */
+@keyframes admin-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.admin-fade-up {
+  animation: admin-fade-up 0.35s ease both;
+}
+@keyframes stat-count {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stat-card-animate {
+  animation: stat-count 0.4s ease both;
+}
+
+/* Admin glassmorphism login */
+.admin-glass-card {
+  background: oklch(0.14 0.01 213 / 0.7);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid oklch(0.72 0.17 213 / 0.2);
+  box-shadow: 0 8px 40px oklch(0 0 0 / 0.5), inset 0 1px 0 oklch(1 0 0 / 0.06);
+}
+
+/* Admin password gate: gold focus glow */
+.admin-glass-card input:focus {
+  outline: none;
+  border-color: oklch(0.82 0.15 85) !important;
+  box-shadow: 0 0 0 2px oklch(0.82 0.15 85 / 0.25) !important;
 }

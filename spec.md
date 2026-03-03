@@ -1,62 +1,41 @@
 # WebFoo Mart
 
 ## Current State
-New project. No existing code.
+- Full-stack e-commerce app with 12 stores, product pages, cart, checkout, orders, admin panel
+- Logo component (`WFLogo.tsx`) references `/assets/uploads/cropped_circle_image-1.png` (old path)
+- A new logo image has been uploaded: `/assets/uploads/cropped_circle_image-1-1.png` (cyan circle with "WEBFOO MART" in black/white, gold geometric lines, tagline "Delivering Desires...")
+- Theme is already dark with cyan primary (#06B6D4 / oklch(0.72 0.17 213))
+- After checkout, a modal popup appears AND a separate `/order-confirmed` route exists
+- Basic card-pop animation exists on stores/products
+- Various page-entry and general UI animations present
 
 ## Requested Changes (Diff)
 
 ### Add
-- Full multi-store e-commerce marketplace with 12 stores
-- Guest browsing (homepage, stores, products, cart) + authenticated checkout/orders/account
-- Admin panel at /admin with password protection (webfoo@admin2026)
-- Bottom navigation bar (only for logged-in customers, 4 tabs)
-- localStorage-based data store for customers, orders, stores, products
-- Seed data: 12 stores, 3-5 products each, 1 demo customer, 1 sample order
-- Blob-storage integration for store/product image uploads in admin
-- Authorization component for session management
-- React Router with all specified routes
-- React Context for cart and auth state
-
-**Pages:**
-- `/` — Homepage: WF logo, search bar, 2-column store grid
-- `/store/:storeId` — Store page: product grid
-- `/product/:productId` — Product detail: photo, description, price, qty selector, reviews, Add to Cart / Buy Now
-- `/cart` — Cart: items list, total, Proceed to Checkout
-- `/checkout` — Checkout: delivery address form, Cash on Delivery, Place Order
-- `/order-confirmed` — Success: order ID, summary
-- `/login` — Login: mobile + password
-- `/register` — Register: name, mobile, password, confirm password
-- `/account` — My Account: profile, edit
-- `/orders` — My Orders: order history with status badges
-- `/admin` — Admin panel: Orders, Manage Stores, Manage Products, Customers tabs
-
-**Admin tabs:**
-- Orders: table with filter by status, status update dropdown
-- Manage Stores: add/edit/delete stores with image upload
-- Manage Products: per-store product management with image upload, in-stock toggle
-- Customers: table with show/hide password, expandable order history
-
-**Data keys in localStorage:**
-- `wfm_customers`: [{id, name, mobile, password, address}]
-- `wfm_orders`: [{id, customerId, customerName, items, total, address, phone, status, createdAt}]
-- `wfm_stores`: [{id, name, imageUrl, createdAt}]
-- `wfm_products`: [{id, storeId, name, price, description, imageUrl, inStock, reviews}]
+- Rich page-entry animations: staggered fade-up for store cards, product cards, page sections on mount
+- Floating/shimmer animations on hero section
+- Smooth hover animations on nav items, buttons, and cards (scale, glow)
+- Scroll-triggered reveal animations for product/store grids
+- Loading skeleton pulse animations
+- Cyan glow effects matching the logo's color to reinforce theme
 
 ### Modify
-- None (new project)
+- **Logo**: Update `WFLogo.tsx` to use the new image path `/assets/uploads/cropped_circle_image-1-1.png` everywhere (header, home hero, login, register, admin login, admin top bar)
+- **Theme**: Strengthen cyan + black + gold accents to match the logo — add gold (`oklch(0.82 0.15 85)`) as a secondary accent color for highlights, borders, tags
+- **Order flow**: Remove the `/order-confirmed` page navigation entirely. After placing an order, only the popup modal shows. "View Order Details" in the popup navigates to `/orders`. "Continue Shopping" dismisses and goes to `/`. The `OrderConfirmedPage` route can remain but is no longer navigated to from checkout.
+- **Card pop animation**: Enhance existing card-pop to feel more springy and satisfying
+- **Page transitions**: Add fade-in on all main page mounts
 
 ### Remove
-- None (new project)
+- Navigation from `onViewDetails` to `/order-confirmed` — replace with navigation to `/orders`
 
 ## Implementation Plan
-1. Select Caffeine components: blob-storage, authorization
-2. Generate Motoko backend canister with blob-storage and authorization support
-3. Build React frontend:
-   a. Setup React Router, global context providers (CartContext, AuthContext)
-   b. Implement localStorage data layer + seed data initialization
-   c. Build shared components: Header, BottomNav, WF Logo, ProductCard, StoreCard
-   d. Implement all customer-facing pages (/, /store, /product, /cart, /checkout, /order-confirmed, /login, /register, /account, /orders)
-   e. Implement admin panel with sidebar and 4 tabs (Orders, Manage Stores, Manage Products, Customers)
-   f. Wire blob-storage for image uploads in admin
-   g. Apply branding: dark #0f0f0f bg, cyan #06B6D4 accent, white text
-   h. Add all data-ocid markers on interactive surfaces
+1. Update `WFLogo.tsx`: change image src to `/assets/uploads/cropped_circle_image-1-1.png`
+2. Update `index.css`: add gold accent CSS variable, enhance card-pop keyframes, add stagger/fade-up/shimmer/glow animation classes
+3. Update `CheckoutPage.tsx`: change `onViewDetails` handler to `navigate("/orders")` instead of `/order-confirmed`
+4. Update `HomePage.tsx`: add staggered fade-up entrance animation to store/product grid items
+5. Update `StorePage.tsx`: add fade-up entrance to product cards
+6. Update `Header.tsx`: add hover glow/scale to logo link
+7. Update `LoginPage.tsx` and `RegisterPage.tsx`: add page fade-in, logo entrance animation
+8. Update `AdminPage.tsx`: ensure admin logo uses new path (already via WFLogo), add any missing gold accent touches
+9. Add subtle floating animation to logo in hero on `HomePage`
